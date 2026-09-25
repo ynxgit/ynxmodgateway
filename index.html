@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Offset Reader</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .subtitle {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .card h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #555;
+        }
+
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+            font-family: 'Courier New', monospace;
+        }
+
+        input[type="text"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            transform: scale(1.02);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        button.secondary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            margin-top: 5px;
+        }
+
+        .results-container {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .results-container h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .offset-item {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .offset-name {
+            font-weight: 600;
+            color: #667eea;
+            font-size: 1.1em;
+            margin-bottom: 8px;
+        }
+
+        .offset-value {
+            color: #555;
+            word-break: break-all;
+            margin-bottom: 5px;
+        }
+
+        .offset-value strong {
+            color: #764ba2;
+        }
+
+        .status {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status.loading {
+            background: #cce5ff;
+            color: #004085;
+            border: 1px solid #b8daff;
+        }
+
+        .mod-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .mod-item {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            border: 2px solid #e0e0e0;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-size: 0.9em;
+            color: #555;
+        }
+
+        .mod-item:hover {
+            background: #e7f3ff;
+            border-color: #667eea;
+            color: #667eea;
+        }
+
+        .mod-item.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 30px;
+            color: #999;
+        }
+
+        .empty-state svg {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .json-output {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .json-key {
+            color: #9cdcfe;
+        }
+
+        .json-string {
+            color: #ce9178;
+        }
+
+        .json-number {
+            color: #b5cea8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎮 Game Offset Reader</h1>
+            <p class="subtitle">Load and parse game memory offsets from JSON configs</p>
+        </header>
+
+        <div class="main-content">
+            <div class="card">
+                <h2>📂 Load Mod</h2>
+                
+                <div class="form-group">
+                    <label for="modSelect">Available Mods:</label>
+                    <div id="modStatus" class="status loading">Loading mods...</div>
+                    <div id="modList" class="mod-list"></div>
+                </div>
+
+                <button onclick="loadMods()">🔄 Refresh Mods</button>
+            </div>
+
+            <div class="card">
+                <h2>⚙️ Manual Lookup</h2>
+                
+                <div class="form-group">
+                    <label for="gameName">Game Name:</label>
+                    <input type="text" id="gameName" placeholder="e.g., Example Game" value="Example Game">
+                </div>
+
+                <div class="form-group">
+                    <label for="processName">Process Name:</label>
+                    <input type="text" id="processName" placeholder="e.g., game.exe" value="game.exe">
+                </div>
+
+                <div class="form-group">
+                    <label for="offsetKey">Offset Key:</label>
+                    <input type="text" id="offsetKey" placeholder="e.g., health" value="health">
+                </div>
+
+                <button onclick="manualLookup()">🔍 Lookup Offset</button>
+            </div>
+        </div>
+
+        <div class="results-container">
+            <h2>📊 Results</h2>
+            <div id="resultsStatus"></div>
+            <div id="results" class="empty-state">
+                <p>Results will appear here...</p>
+            </div>
+            
+            <div id="jsonOutputContainer" style="display: none; margin-top: 20px;">
+                <h3 style="margin-bottom: 10px; color: #667eea;">Raw JSON Output</h3>
+                <div id="jsonOutput" class="json-output"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Store loaded mods data
+        let modsData = {};
+        let currentLoadedMod = null;
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadMods();
+        });
+
+        // Load all mods from the mods folder
+        async function loadMods() {
+            try {
+                const modStatus = document.getElementById('modStatus');
+                modStatus.textContent = '⏳ Loading mods...';
+                modStatus.className = 'status loading';
+
+                // Fetch the list of mod files
+                const response = await fetch('./mods/');
+                
+                if (!response.ok) {
+                    throw new Error('Could not fetch mods directory');
+                }
+
+                const html = await response.text();
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                
+                // Extract JSON file links
+                const links = Array.from(doc.querySelectorAll('a'))
+                    .map(a => a.textContent)
+                    .filter(text => text.endsWith('.json'));
+
+                if (links.length === 0) {
+                    modStatus.textContent = '⚠️ No mods found in /mods/ directory';
+                    modStatus.className = 'status error';
+                    document.getElementById('modList').innerHTML = '';
+                    return;
+                }
+
+                // Load each mod JSON file
+                modsData = {};
+                for (const filename of links) {
+                    try {
+                        const modResponse = await fetch(`./mods/${filename}`);
+                        const data = await modResponse.json();
+                        modsData[filename.replace('.json', '')] = data;
+                    } catch (e) {
+                        console.error(`Failed to load mod: ${filename}`, e);
+                    }
+                }
+
+                // Display loaded mods
+                displayModsList();
+                modStatus.textContent = `✅ Loaded ${Object.keys(modsData).length} mod(s)`;
+                modStatus.className = 'status success';
+
+            } catch (error) {
+                console.error('Error loading mods:', error);
+                const modStatus = document.getElementById('modStatus');
+                modStatus.textContent = `❌ Error: ${error.message}`;
+                modStatus.className = 'status error';
+            }
+        }
+
+        // Display the list of loaded mods
+        function displayModsList() {
+            const modList = document.getElementById('modList');
+            modList.innerHTML = '';
+
+            for (const modName in modsData) {
+                const modItem = document.createElement('div');
+                modItem.className = 'mod-item';
+                modItem.textContent = modName;
+                modItem.onclick = () => selectMod(modName);
+                modList.appendChild(modItem);
+            }
+        }
+
+        // Select a mod and display its data
+        function selectMod(modName) {
+            currentLoadedMod = modName;
+            const modData = modsData[modName];
+
+            // Update UI
+            document.querySelectorAll('.mod-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Display results
+            displayOffsets(modData, modName);
+        }
+
+        // Display offset data
+        function displayOffsets(data, modName) {
+            const resultsStatus = document.getElementById('resultsStatus');
+            const results = document.getElementById('results');
+            const jsonOutputContainer = document.getElementById('jsonOutputContainer');
+            const jsonOutput = document.getElementById('jsonOutput');
+
+            resultsStatus.innerHTML = `<div class="status success">✅ Loaded mod: <strong>${modName}</strong></div>`;
+
+            results.innerHTML = '';
+
+            if (!data.offsets || Object.keys(data.offsets).length === 0) {
+                results.innerHTML = '<p>No offsets defined in this mod.</p>';
+                return;
+            }
+
+            // Display each offset
+            for (const [offsetName, offsetData] of Object.entries(data.offsets)) {
+                const item = document.createElement('div');
+                item.className = 'offset-item';
+
+                let content = `<div class="offset-name">${offsetName}</div>`;
+                
+                if (typeof offsetData === 'object') {
+                    content += `<div class="offset-value"><strong>Base:</strong> ${offsetData.base}</div>`;
+                    if (offsetData.offset) {
+                        content += `<div class="offset-value"><strong>Offset:</strong> ${offsetData.offset}</div>`;
+                    }
+                    if (offsetData.full) {
+                        content += `<div class="offset-value"><strong>Full Address:</strong> ${offsetData.full}</div>`;
+                    }
+                    if (offsetData.type) {
+                        content += `<div class="offset-value"><strong>Type:</strong> ${offsetData.type}</div>`;
+                    }
+                } else {
+                    content += `<div class="offset-value"><strong>Value:</strong> ${offsetData}</div>`;
+                }
+
+                item.innerHTML = content;
+                results.appendChild(item);
+            }
+
+            // Display raw JSON
+            jsonOutput.textContent = JSON.stringify(data, null, 2);
+            jsonOutputContainer.style.display = 'block';
+        }
+
+        // Manual offset lookup
+        function manualLookup() {
+            const gameName = document.getElementById('gameName').value;
+            const processName = document.getElementById('processName').value;
+            const offsetKey = document.getElementById('offsetKey').value;
+
+            if (!gameName || !processName || !offsetKey) {
+                showStatus('Please fill in all fields', 'error');
+                return;
+            }
+
+            // Search through all loaded mods
+            for (const [modName, modData] of Object.entries(modsData)) {
+                if (modData.game === gameName && modData.process === processName) {
+                    if (modData.offsets && modData.offsets[offsetKey]) {
+                        displayOffsets(modData, modName);
+                        return;
+                    }
+                }
+            }
+
+            showStatus(`Offset "${offsetKey}" not found for ${gameName} (${processName})`, 'error');
+        }
+
+        // Utility to show status messages
+        function showStatus(message, type = 'info') {
+            const resultsStatus = document.getElementById('resultsStatus');
+            resultsStatus.innerHTML = `<div class="status ${type}">${message}</div>`;
+        }
+    </script>
+</body>
+</html>
