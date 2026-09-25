@@ -1,0 +1,63 @@
+{
+  "game": "Example Game",
+  "process": "game.exe",
+  "version": "1.0.0",
+  "description": "Memory offsets for Example Game v1.0",
+  "base": "game.exe",
+  "offsets": {
+    "health": {
+      "base": "game.exe+0x1A2B4C0",
+      "offset": "0x140",
+      "full": "game.exe+0x1A2B4C0+0x140",
+      "type": "int"
+    },
+    "mana": {
+      "base": "game.exe+0x1A2B4C0",
+      "offset": "0x144",
+      "full": "game.exe+0x1A2B4C0+0x144",
+      "type": "int"
+    },
+    "stamina": {
+      "base": "game.dll+0x5C3E00",
+      "offset": "0x38",
+      "full": "game.dll+0x5C3E00+0x38",
+      "type": "float"
+    },
+    "position_x": {
+      "base": "game.exe+0x2F4D8E0",
+      "offset": "0x0",
+      "full": "game.exe+0x2F4D8E0+0x0",
+      "type": "float"
+    },
+    "position_y": {
+      "base": "game.exe+0x2F4D8E0",
+      "offset": "0x4",
+      "full": "game.exe+0x2F4D8E0+0x4",
+      "type": "float"
+    },
+    "position_z": {
+      "base": "game.exe+0x2F4D8E0",
+      "offset": "0x8",
+      "full": "game.exe+0x2F4D8E0+0x8",
+      "type": "float"
+    },
+    "exp": {
+      "base": "game.dll+0x1C5A240",
+      "offset": "0x158",
+      "full": "game.dll+0x1C5A240+0x158",
+      "type": "long"
+    },
+    "level": {
+      "base": "game.exe+0x1A2B4C0",
+      "offset": "0x14C",
+      "full": "game.exe+0x1A2B4C0+0x14C",
+      "type": "int"
+    },
+    "coins": {
+      "base": "game.dll+0x8A3E1C0",
+      "offset": "0x78",
+      "full": "game.dll+0x8A3E1C0+0x78",
+      "type": "int"
+    }
+  }
+}
